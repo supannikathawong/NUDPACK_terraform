@@ -1,26 +1,25 @@
-# โครงการ Deploy Web Application ด้วย Terraform บน AWS
+# Deploy Web Application ด้วย Terraform บน AWS
 
-## ภาพรวมโครงการ
+## ภาพรวมโปรเจกต์
 
-1. แนวคิดของโครงการ
+โปรเจกต์นี้เป็นการนำ Web Application ที่พัฒนาด้วย **Python (FastAPI)** ร่วมกับ **HTML Frontend** ไปติดตั้งบนระบบ Cloud โดยใช้แนวคิด **Infrastructure as Code (IaC)** ผ่าน Terraform เพื่อจัดการและสร้างโครงสร้างพื้นฐานแบบอัตโนมัติบน AWS
 
-โครงการนี้มีวัตถุประสงค์เพื่อพัฒนาและนำระบบ Web Application ขึ้นใช้งานบน Cloud โดยใช้แนวคิด Infrastructure as Code (IaC) ผ่าน Terraform เพื่อให้สามารถสร้างและจัดการโครงสร้างพื้นฐานได้อย่างอัตโนมัติ
+ภายในระบบจะมีการทำงานดังนี้:
 
-ตัวระบบพัฒนาด้วย Python FastAPI สำหรับฝั่ง Backend และ HTML สำหรับฝั่ง Frontend พร้อมเชื่อมต่อฐานข้อมูลแบบ Cloud คือ Neon PostgreSQL
+* สร้าง EC2 Instance สำหรับรันแอป
+* ตั้งค่า Security Group เพื่อเปิดพอร์ตที่จำเป็น
+* สร้าง SSH Key สำหรับเชื่อมต่อ
+* ดึงซอร์สโค้ดจาก GitHub
+* ติดตั้ง Dependencies ที่จำเป็น
+* เปิดใช้งาน FastAPI Server
 
-การ Deploy จะดำเนินการบน AWS EC2 โดย Terraform จะทำหน้าที่สร้างและตั้งค่าทุกองค์ประกอบของระบบ
+ในส่วนของฐานข้อมูล ระบบจะเชื่อมต่อกับ **Neon PostgreSQL** ซึ่งเป็นฐานข้อมูลแบบ Cloud
 
-2. ขอบเขตการทำงานของระบบ
+---
 
-Terraform จะดำเนินการอัตโนมัติในขั้นตอนต่อไปนี้
+## โครงสร้างโปรเจกต์
 
-สร้าง EC2 Instance สำหรับรันแอปพลิเคชัน
-กำหนด Security Group เพื่อควบคุมการเข้าถึง
-สร้าง SSH Key Pair สำหรับการเชื่อมต่อ
-ดึง Source Code จาก GitHub
-ติดตั้ง Python และ Dependencies
-เรียกใช้งาน FastAPI Server
-3. โครงสร้างโปรเจค
+```
 NUDPACK/
 │
 ├── terraform/
@@ -32,109 +31,219 @@ NUDPACK/
 │
 ├── deploy.sh
 └── README.md
+```
 
-รายละเอียดไฟล์สำคัญ
+### 🔎 รายละเอียดไฟล์สำคัญ
 
-main.tf
-ใช้กำหนด Resource หลัก เช่น EC2, Security Group และ Key Pair
-variables.tf
-ใช้กำหนดค่าพารามิเตอร์ เช่น Region และ Instance Type
-outputs.tf
-ใช้แสดงผลลัพธ์ เช่น Public URL ของระบบหลัง Deploy
-4. เทคโนโลยีที่ใช้
-Terraform (Infrastructure as Code)
-AWS EC2 (Cloud Server)
-Python FastAPI (Backend)
-Uvicorn (Application Server)
-PostgreSQL (Neon Database)
-GitHub (Source Code Management)
-5. ขั้นตอนการใช้งานระบบ
-5.1 เตรียมเครื่องมือ
+* **main.tf**
+  ใช้กำหนด Resource ต่าง ๆ ที่จะสร้างบน AWS เช่น EC2, Security Group และ Key Pair
 
-ติดตั้งโปรแกรมที่จำเป็น ได้แก่
+* **variables.tf**
+  ใช้เก็บค่าตัวแปร เช่น region หรือ instance type เพื่อให้ปรับค่าได้ง่าย
 
-Terraform
-AWS CLI
-Git
+* **outputs.tf**
+  ใช้แสดงผลลัพธ์หลังจาก deploy เช่น URL สำหรับเข้าใช้งานระบบ
 
-ตรวจสอบการติดตั้ง
+---
 
+## 🛠 เทคโนโลยีที่ใช้
+
+* Terraform
+* AWS EC2
+* FastAPI
+* Uvicorn
+* PostgreSQL (Neon)
+* GitHub
+
+---
+
+## ขั้นตอนการติดตั้งและใช้งาน
+
+### 1 ติดตั้งเครื่องมือพื้นฐาน
+
+ก่อนเริ่มใช้งาน ต้องติดตั้งโปรแกรมเหล่านี้ให้เรียบร้อย:
+
+* Terraform
+* AWS CLI
+* Git
+
+ตรวจสอบว่าใช้งานได้ด้วยคำสั่ง:
+
+```
 terraform -version
 aws --version
 git --version
-5.2 ตั้งค่า AWS CLI
+```
 
-กำหนดค่าการเชื่อมต่อ AWS
+---
 
+### 2️ ตั้งค่า AWS CLI
+
+ต้องเชื่อมต่อ AWS ก่อนใช้งาน Terraform
+
+ใช้คำสั่ง:
+
+```
 aws configure
+```
 
-กรอกข้อมูล
+แล้วกรอกข้อมูล:
 
+```
 AWS Access Key ID
 AWS Secret Access Key
 Region (เช่น ap-southeast-1)
 Output format (json)
-5.3 เตรียมโปรเจค
+```
+
+---
+
+### 3️ Clone โปรเจกต์
+
+ดาวน์โหลดโปรเจกต์จาก GitHub:
+
+```
 git clone <repository-url>
 cd NUDPACK/terraform
-5.4 เริ่มต้น Terraform
+```
+
+---
+
+### 4️ เริ่มต้น Terraform
+
+รันคำสั่ง:
+
+```
 terraform init
+```
 
-ใช้สำหรับเตรียมระบบและติดตั้ง Provider
+เพื่อให้ Terraform เตรียม environment และดาวน์โหลด provider ที่จำเป็น
 
-5.5 ตรวจสอบแผนการสร้างระบบ
+---
+
+### 5️ ตรวจสอบแผนการสร้างระบบ
+
+ใช้คำสั่ง:
+
+```
 terraform plan
+```
 
-แสดงรายการ Resource ที่จะถูกสร้าง เช่น
+คำสั่งนี้จะแสดงรายการสิ่งที่ Terraform จะสร้าง เช่น:
 
-EC2 Instance
-Security Group
-Key Pair
-5.6 Deploy ระบบ
+* EC2 Instance
+* Security Group
+* Key Pair
+
+---
+
+### 6️ Deploy ระบบจริง
+
+ใช้คำสั่ง:
+
+```
 terraform apply
+```
 
-พิมพ์ yes เพื่อยืนยัน
+เมื่อระบบถามให้ยืนยัน ให้พิมพ์:
 
-ระบบจะดำเนินการ
+```
+yes
+```
 
-สร้าง Infrastructure บน AWS
-ติดตั้งระบบและ Dependencies
-รัน FastAPI Server
+Terraform จะทำงานดังนี้:
 
-เมื่อเสร็จสิ้น จะได้ URL สำหรับเข้าใช้งาน เช่น
+1. สร้าง EC2 Instance
+2. ตั้งค่า Security Group
+3. ดึงโค้ดจาก GitHub
+4. ติดตั้ง Python และ Dependencies
+5. รัน FastAPI Server
 
+หลังจากเสร็จ จะได้ URL เช่น:
+
+```
+app_public_url = http://<EC2_PUBLIC_IP>:8000
+```
+
+---
+
+### 7️ ตรวจสอบการทำงาน
+
+เปิด Web Browser แล้วเข้าไปที่:
+
+```
 http://<EC2_PUBLIC_IP>:8000
-5.7 ทดสอบการทำงาน
 
-เปิด Web Browser และเข้า URL ที่ได้
+    หลัง :8000 ให้ต่อด้วย 
+      /client (สำหรับคนส่งพัสดุ)
+      /admin (สำหรับแอดมิน) แต่เนื่องจากระบบมีการใช้งานจริงที่สำนักงานกองกิจ ดังนั้นจึงไม่สามารถให้รหัสผ่านของ admin ได้ค่ะ
+      /recipient (สำหรับคนรับพัสดุ)
+```
 
-ระบบจะสามารถใช้งานได้ และเชื่อมต่อกับฐานข้อมูล Neon PostgreSQL ได้เรียบร้อย
+หากระบบทำงานถูกต้อง จะสามารถใช้งานแอปได้ และเชื่อมต่อฐานข้อมูล Neon ได้เรียบร้อย
 
-5.8 ลบระบบเมื่อไม่ใช้งาน
+ตัวอย่าง
+---
+สำหรับคนส่งพัสดุ(ขนส่งเอกชน)
+```
+  http://13.212.105.160:8000/client
+```
+สำหรับแอดมิน
+```
+  http://13.212.105.160:8000/admin
+```
+สำหรับคนรับพัสดุ
+```
+  http://13.212.105.160:8000/recipient
+```
+
+### 8️ ลบระบบเมื่อใช้งานเสร็จ
+
+เพื่อป้องกันค่าใช้จ่าย ควรลบ resource หลังใช้งาน
+
+ใช้คำสั่ง:
+
+```
 terraform destroy
+```
 
-ยืนยันด้วย yes
+แล้วพิมพ์:
 
-ระบบจะลบ Resource ทั้งหมด เช่น
+```
+yes
+```
 
-EC2 Instance
-Security Group
-Key Pair
-6. ภาพรวมการทำงานของระบบ
+Terraform จะลบทุกอย่างที่สร้างไว้ เช่น:
+
+* EC2 Instance
+* Security Group
+* Key Pair
+
+---
+
+## ภาพรวมการทำงาน
+
+```
 Terraform
    │
    ▼
-Provision Infrastructure (AWS EC2)
+AWS EC2
    │
-   ▼
-Deploy Application (FastAPI)
-   │
-   ▼
-Connect Database (Neon PostgreSQL)
-   │
-   ▼
-User Access via Web Browser
+   ├── ติดตั้ง Python
+   ├── Clone โค้ดจาก GitHub
+   ├── ติดตั้ง Dependencies
+   └── รัน FastAPI
+            │
+            ▼
+      Neon PostgreSQL
+```
 
-# หมายเหตุ
+ผู้ใช้สามารถเข้าถึงระบบผ่าน Browser โดยใช้ IP ของ EC2
 
-ก่อนการใช้งาน Terraform จำเป็นต้อง Login AWS CLI ก่อนทุกครั้ง หากยังไม่ได้ตั้งค่า AWS CLI ระบบจะไม่สามารถสร้าง Infrastructure บน AWS ได้
+---
+
+## หมายเหตุสำคัญ
+
+ก่อนใช้งาน Terraform ทุกครั้ง จำเป็นต้องตั้งค่า AWS CLI ให้เรียบร้อย หากยังไม่ได้ตั้งค่า ระบบจะไม่สามารถสร้าง Infrastructure บน AWS ได้
+
+---
